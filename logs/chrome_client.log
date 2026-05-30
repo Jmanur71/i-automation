@@ -1,0 +1,114 @@
+2026-05-29 23:47:31,865 [INFO] ====== WebDriver manager ======
+2026-05-29 23:47:34,664 [INFO] Driver [C:\Users\Windows\.wdm\drivers\chromedriver\win64\148.0.7778.178\chromedriver-win64/chromedriver.exe] found in cache by browser version
+2026-05-29 23:47:34,669 [INFO] Launching Chrome (headless=False)
+2026-05-29 23:47:38,468 [INFO] Navigating to https://www.google.com
+2026-05-29 23:49:45,095 [INFO] ====== WebDriver manager ======
+2026-05-29 23:49:59,362 [INFO] Driver [C:\Users\Windows\.wdm\drivers\chromedriver\win64\148.0.7778.178\chromedriver-win64/chromedriver.exe] found in cache by browser version
+2026-05-29 23:49:59,399 [INFO] Launching Chrome (headless=False)
+2026-05-29 23:50:06,798 [INFO] Navigating to https://www.google.com
+2026-05-29 23:52:29,960 [WARNING] Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'ReadTimeoutError("HTTPConnectionPool(host='localhost', port=57539): Read timed out. (read timeout=120)")': /session/e966283c55735b7a96690f817b9fe81d/element/f.DC7DBBD964BB9FB8780455573315A5DC.d.23203907FEC0EC3CB4903E2BB26870B7.e.152/text
+2026-05-29 23:53:55,366 [INFO] ====== WebDriver manager ======
+2026-05-29 23:54:13,377 [INFO] Driver [C:\Users\Windows\.wdm\drivers\chromedriver\win64\148.0.7778.178\chromedriver-win64/chromedriver.exe] found in cache by browser version
+2026-05-29 23:54:13,383 [INFO] Launching Chrome (headless=False)
+2026-05-29 23:54:23,814 [INFO] Navigating to https://www.google.com
+2026-05-29 23:54:31,046 [WARNING] Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'ReadTimeoutError("HTTPConnectionPool(host='localhost', port=57539): Read timed out. (read timeout=120)")': /session/e966283c55735b7a96690f817b9fe81d/element/f.DC7DBBD964BB9FB8780455573315A5DC.d.23203907FEC0EC3CB4903E2BB26870B7.e.152/text
+2026-05-29 23:54:56,938 [INFO] AI Mode selector found: //a[normalize-space()='AI Mode']
+2026-05-29 23:55:13,569 [INFO] Switched to Google AI Mode
+2026-05-29 23:55:42,237 [WARNING] Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None)': /session/45b87f65d5b9b828df303ce6f3998171
+2026-05-30 10:10:58,776 [WARNING] Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'ReadTimeoutError("HTTPConnectionPool(host='localhost', port=57539): Read timed out. (read timeout=120)")': /session/e966283c55735b7a96690f817b9fe81d/element/f.DC7DBBD964BB9FB8780455573315A5DC.d.23203907FEC0EC3CB4903E2BB26870B7.e.152/text
+2026-05-30 10:22:52,218 [INFO] Launching Chrome (headless=False)
+2026-05-30 10:22:54,340 [INFO] Navigating to https://www.google.com
+2026-05-30 10:23:00,826 [INFO] AI Mode selector found: //a[normalize-space()='AI Mode']
+2026-05-30 10:23:07,281 [INFO] Switched to Google AI Mode
+2026-05-30 10:23:07,615 [INFO] Closing Chrome WebDriver
+2026-05-30 10:23:20,720 [INFO] Launching Chrome (headless=False)
+2026-05-30 10:23:22,512 [INFO] Navigating to https://www.google.com
+2026-05-30 10:26:52,605 [INFO] Initializing ChromeClient
+2026-05-30 10:26:53,809 [INFO] Launching Chrome (headless=False)
+2026-05-30 10:26:55,653 [INFO] Starting Voice Assistant
+2026-05-30 10:27:49,979 [INFO] Initializing ChromeClient
+2026-05-30 10:27:50,800 [INFO] Launching Chrome (headless=False)
+2026-05-30 10:27:52,239 [INFO] Starting Voice Assistant
+2026-05-30 10:27:52,487 [INFO] Voice Assistant ready. Hotkey: <ctrl>+<shift>+<space>
+2026-05-30 10:28:13,029 [WARNING] Speech not recognized (inaudible audio)
+2026-05-30 10:29:12,926 [INFO] Initializing ChromeClient
+2026-05-30 10:29:13,903 [INFO] Launching Chrome (headless=False)
+2026-05-30 10:29:15,647 [INFO] Starting Voice Assistant
+2026-05-30 10:29:15,862 [INFO] Voice Assistant ready. Hotkey: <ctrl>+<shift>+<space>
+2026-05-30 10:29:22,159 [INFO] Transcription successful: "what is development"
+2026-05-30 10:29:22,169 [INFO] Navigating to https://www.google.com
+2026-05-30 10:29:29,694 [INFO] AI Mode selector found: //a[normalize-space()='AI Mode']
+2026-05-30 10:29:33,714 [INFO] Switched to Google AI Mode
+2026-05-30 10:49:39,036 [INFO] Transcription successful: "1829"
+2026-05-30 10:49:39,048 [INFO] Navigating to https://www.google.com
+2026-05-30 10:49:40,888 [INFO] Transcription successful: "what is darker"
+2026-05-30 10:49:40,893 [INFO] Navigating to https://www.google.com
+2026-05-30 10:49:45,744 [INFO] AI Mode selector found: //a[normalize-space()='AI Mode']
+2026-05-30 10:49:45,786 [INFO] AI Mode selector found: //a[normalize-space()='AI Mode']
+2026-05-30 10:49:47,680 [INFO] Switched to Google AI Mode
+2026-05-30 10:49:59,807 [INFO] AI Mode selector found: //div[normalize-space()='AI Mode']
+2026-05-30 10:49:59,907 [INFO] Switched to Google AI Mode
+2026-05-30 10:50:04,545 [INFO] Transcription successful: "what is the governor of"
+2026-05-30 10:50:04,552 [INFO] Navigating to https://www.google.com
+2026-05-30 10:50:07,812 [INFO] AI Mode selector found: //a[normalize-space()='AI Mode']
+2026-05-30 10:50:08,931 [INFO] Switched to Google AI Mode
+2026-05-30 10:50:20,597 [INFO] Transcription successful: "what is the current"
+2026-05-30 10:50:20,604 [INFO] Navigating to https://www.google.com
+2026-05-30 10:50:23,714 [INFO] AI Mode selector found: //a[normalize-space()='AI Mode']
+2026-05-30 10:50:25,736 [INFO] Switched to Google AI Mode
+2026-05-30 10:50:32,989 [INFO] Transcription successful: "Marathi"
+2026-05-30 10:50:33,001 [INFO] Navigating to https://www.google.com
+2026-05-30 10:50:36,010 [INFO] AI Mode selector found: //a[normalize-space()='AI Mode']
+2026-05-30 10:51:19,453 [INFO] Initializing ChromeClient
+2026-05-30 10:51:20,312 [INFO] Launching Chrome (headless=False)
+2026-05-30 10:51:22,083 [INFO] Starting Voice Assistant
+2026-05-30 10:51:22,269 [INFO] Voice Assistant ready. Hotkey: <ctrl>+<shift>+<space>
+2026-05-30 10:51:34,457 [WARNING] Speech not recognized (inaudible audio)
+2026-05-30 10:51:53,344 [INFO] Transcription successful: "what is the current"
+2026-05-30 10:51:53,355 [INFO] Navigating to https://www.google.com
+2026-05-30 10:51:58,234 [INFO] AI Mode selector found: //a[normalize-space()='AI Mode']
+2026-05-30 10:52:01,173 [INFO] Switched to Google AI Mode
+2026-05-30 10:53:07,142 [INFO] Transcription successful: "what is Jagran"
+2026-05-30 10:53:07,149 [INFO] Navigating to https://www.google.com
+2026-05-30 10:53:10,443 [INFO] AI Mode selector found: //a[normalize-space()='AI Mode']
+2026-05-30 10:53:11,917 [INFO] Switched to Google AI Mode
+2026-05-30 10:53:40,460 [INFO] Transcription successful: "what is the current account"
+2026-05-30 10:53:40,467 [INFO] Navigating to https://www.google.com
+2026-05-30 10:53:46,749 [INFO] AI Mode selector found: //a[normalize-space()='AI Mode']
+2026-05-30 10:53:48,384 [INFO] Switched to Google AI Mode
+2026-05-30 11:34:07,263 [INFO] Initializing ChromeClient
+2026-05-30 11:34:08,209 [INFO] Launching Chrome (headless=False)
+2026-05-30 11:34:10,057 [INFO] Starting Voice Assistant
+2026-05-30 11:34:10,312 [INFO] Voice Assistant ready. Hotkey: <ctrl>+<shift>+<space>
+2026-05-30 11:34:24,249 [INFO] Calibrating ambient noise for 1.5 seconds
+2026-05-30 11:34:26,474 [INFO] Ambient noise threshold set to 876
+2026-05-30 11:34:30,258 [WARNING] Speech not recognized (inaudible audio)
+2026-05-30 11:34:55,269 [INFO] Transcription successful: "what is the current how it will be used"
+2026-05-30 11:34:55,281 [INFO] Navigating to https://www.google.com
+2026-05-30 11:35:01,566 [INFO] AI Mode selector found: //a[normalize-space()='AI Mode']
+2026-05-30 11:35:04,320 [INFO] Switched to Google AI Mode
+2026-05-30 11:36:42,759 [WARNING] Speech not recognized (inaudible audio)
+2026-05-30 11:36:53,373 [WARNING] Speech not recognized (inaudible audio)
+2026-05-30 11:51:16,498 [INFO] Initializing ChromeClient
+2026-05-30 11:51:17,336 [INFO] Launching Chrome (headless=False)
+2026-05-30 11:51:19,207 [INFO] Starting Voice Assistant
+2026-05-30 11:51:19,337 [INFO] Voice Assistant ready. Hotkey: <ctrl>+<shift>+<space>
+2026-05-30 11:51:29,516 [INFO] Calibrating ambient noise for 1.5 seconds
+2026-05-30 11:51:31,144 [INFO] Ambient noise threshold set to 100
+2026-05-30 11:51:31,145 [INFO] Recording audio for up to 8 seconds
+2026-05-30 11:51:40,305 [INFO] Transcription successful: "it will be useful"
+2026-05-30 11:51:40,310 [INFO] Navigating to https://www.google.com
+2026-05-30 11:51:45,246 [INFO] AI Mode selector found: //a[normalize-space()='AI Mode']
+2026-05-30 11:51:47,994 [INFO] Switched to Google AI Mode
+2026-05-30 11:52:04,918 [INFO] Calibrating ambient noise for 1.5 seconds
+2026-05-30 11:52:06,529 [INFO] Ambient noise threshold set to 129
+2026-05-30 11:52:06,529 [INFO] Recording audio for up to 8 seconds
+2026-05-30 11:52:15,963 [INFO] Transcription successful: "it will be useful"
+2026-05-30 11:52:15,971 [INFO] Navigating to https://www.google.com
+2026-05-30 11:52:21,348 [INFO] AI Mode selector found: //a[normalize-space()='AI Mode']
+2026-05-30 11:52:23,216 [INFO] Switched to Google AI Mode
+2026-05-30 18:50:28,844 [INFO] Calibrating ambient noise for 1.5 seconds
+2026-05-30 18:50:30,458 [INFO] Ambient noise threshold set to 100
+2026-05-30 18:50:30,458 [INFO] Recording audio for up to 10 seconds
+2026-05-30 18:50:40,927 [WARNING] Speech not recognized (inaudible audio)
+2026-05-30 18:50:41,923 [WARNING] Speech not recognized (inaudible audio)

@@ -15,7 +15,7 @@ ENABLE_NOISE_CALIBRATION = False  # Disable on every call - use fixed threshold
 NOISE_CALIBRATION_SECONDS = 0.5  # Faster calibration
 RECOGNITION_LANGUAGE = 'en-US'
 NORMALIZE_AUDIO = True
-MAX_RECORDING_SECONDS = 6  # Give the user time to finish longer questions
+MAX_RECORDING_SECONDS = 8  # Give the user time to finish longer questions
 MAX_AI_TOKENS = 250  # Ultra-concise responses (was 500, now 250)
 AI_TEMPERATURE = 0.5  # Balanced for speed (was 0.3, now 0.5 for faster inference)
 ULTRA_FAST_MODE = True  # Enable streaming + parallel processing
@@ -56,3 +56,6 @@ CHROME_USER_DATA_DIR = None
 CHROME_AI_TARGET = 'google'
 # When using Google, proactively attempt to switch the search page into AI Mode.
 CHROME_GOOGLE_AI_MODE = True
+GOOGLE_AI_CACHE_TTL_SECONDS = 600
+GOOGLE_AI_MIN_REQUEST_INTERVAL_SECONDS = 1.5
+GOOGLE_AI_PAGE_TIMEOUT_SECONDS = 12

@@ -9,7 +9,7 @@ class SettingsManager:
     
     def load_settings(self):
         defaults = {
-            "ai_provider": "groq",  # groq (fast free), openai, anthropic, google
+            "ai_provider": "google",  # google (Google Search AI Mode)
             "groq_api_key": "",
             "hotkey": "Ctrl+Shift+Space",
             "wake_word_enabled": False,

@@ -1,7 +1,5 @@
 from config import DEVOPS_COACH_MODE, LOGGER
-from http_utils import http_get_json, http_post_json
 from response_formatter import stream_interview_answer
-from devops_knowledge_base import answer as answer_devops_question
 
 
 INTERVIEW_PROMPTS = {
@@ -146,43 +144,13 @@ FOCUS TERM:
         return INTERVIEW_PROMPTS["quick_tech"]
 
     def query(self, text, callback):
-        local_answer = answer_devops_question(text, experience_years=self.experience_years)
-        if local_answer:
-            LOGGER.debug("Answered from local DevOps knowledge base")
-            return stream_interview_answer(callback, local_answer, question=text)
-
-        result = None
-
-        if self.provider == "groq" and self.api_key:
-            LOGGER.debug("Trying Groq provider")
-            result = self._query_groq(text, callback)
-            if result:
-                return result
-
-        if self.provider == "openai" and self.api_key:
-            LOGGER.debug("Trying OpenAI provider")
-            result = self._query_openai(text, callback)
-            if result:
-                return result
-
-        if self.provider == "anthropic" and self.api_key:
-            LOGGER.debug("Trying Anthropic provider")
-            result = self._query_anthropic(text, callback)
-            if result:
-                return result
-
-        LOGGER.debug("Trying free AI provider fallback")
-        result = self._query_free_ai(text, callback)
+        LOGGER.debug("Querying Google Search AI Mode for answer")
+        result = self._query_google(text, callback)
         if result:
             return result
 
-        LOGGER.debug("Trying web AI fallback")
-        result = self._query_web_ai(text, callback)
-        if result:
-            return result
-
-        LOGGER.debug("Trying browser fallback")
-        return self._query_google(text, callback)
+        fallback = "Google did not return an AI overview for this question."
+        return stream_interview_answer(callback, fallback, question=text)
 
     def _query_groq(self, text, callback):
         try:
@@ -194,60 +162,6 @@ FOCUS TERM:
         except Exception as e:
             LOGGER.debug("Groq failed: %s", e)
         return None
-
-    def _query_free_ai(self, text, callback):
-        try:
-            from free_ai_provider import FreeAIProvider
-
-            provider = FreeAIProvider()
-            return provider.query(text, callback)
-        except Exception as e:
-            LOGGER.debug("Free AI failed: %s", e)
-        return None
-
-    def _query_web_ai(self, text, callback):
-        try:
-            answers = []
-            ddg_answer = self._get_duckduckgo_answer(text)
-            if ddg_answer and len(ddg_answer) > 50:
-                answers.append(ddg_answer)
-
-            wiki_answer = self._get_wikipedia_answer(text)
-            if wiki_answer and len(wiki_answer) > 50:
-                answers.append(wiki_answer)
-
-            if answers:
-                best_answer = max(answers, key=len)
-                LOGGER.info("Web AI answered")
-                return stream_interview_answer(callback, best_answer, question=text)
-        except Exception as e:
-            LOGGER.debug("Web AI failed: %s", e)
-        return None
-
-    def _get_duckduckgo_answer(self, text):
-        try:
-            url = "https://api.duckduckgo.com/"
-            params = {"q": text, "format": "json", "no_html": 1, "skip_disambig": 1}
-            data = http_get_json(url, params=params, timeout=5)
-            return data.get("AbstractText") or data.get("Answer") or data.get("Definition") or ""
-        except Exception:
-            return None
-
-    def _get_wikipedia_answer(self, text):
-        try:
-            search_url = "https://en.wikipedia.org/w/api.php"
-            search_params = {"action": "opensearch", "search": text, "limit": 1, "format": "json"}
-            search_data = http_get_json(search_url, params=search_params, timeout=5)
-            if len(search_data) > 1 and len(search_data[1]) > 0:
-                page_title = search_data[1][0]
-                summary_url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{page_title}"
-                wiki_data = http_get_json(summary_url, timeout=5)
-                extract = wiki_data.get("extract", "")
-                if extract:
-                    sentences = extract.split(". ")
-                    return ". ".join(sentences[:3]) + "."
-        except Exception:
-            return None
 
     def _query_openai(self, text, callback):
         if not self.api_key:
@@ -267,6 +181,8 @@ FOCUS TERM:
                 "temperature": 0.3,
                 "max_tokens": 500,
             }
+            from http_utils import http_post_json
+
             response = http_post_json(url, data, headers=headers, timeout=30)
             return stream_interview_answer(callback, response["choices"][0]["message"]["content"].strip(), question=text)
         except Exception as e:
@@ -291,6 +207,8 @@ FOCUS TERM:
                 "max_tokens": 1024,
                 "stream": False,
             }
+            from http_utils import http_post_json
+
             response = http_post_json(url, data, headers=headers, timeout=30)
             content_parts = []
             for part in response.get("content", []):

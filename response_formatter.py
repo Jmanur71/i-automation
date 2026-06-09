@@ -56,13 +56,6 @@ def stream_interview_answer(callback, text, question=None):
     if not formatted:
         return ""
 
-    if question and looks_like_hallucinated_acronym_answer(question, formatted):
-        term = question.strip().rstrip("?.")
-        fallback = f"- I don't know a standard DevOps meaning for {term}.\n- If you mean a specific tool or acronym, tell me the exact expansion.\n- For DevOps interviews, answer with the most common industry meaning only."
-        for i, line in enumerate(fallback.splitlines()):
-            callback(line if i == 0 else "\n" + line)
-        return fallback
-
     lines = formatted.splitlines()
     for i, line in enumerate(lines):
         if i == 0:

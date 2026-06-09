@@ -97,19 +97,12 @@ class VoiceAssistant:
         LOGGER.info(f'⚡ Ultra-Fast: {ULTRA_FAST_MODE} | Tokens: {MAX_AI_TOKENS} | Temp: {AI_TEMPERATURE} | Response: <2s')
         
         # Initialize AI provider based on settings
-        provider = self.settings.get('ai_provider', 'groq')
+        provider = 'google'
         experience_years = self.settings.get('target_experience_years', 5)
-        api_key = None
-        if provider == 'groq':
-            api_key = self.settings.get('groq_api_key')
-        elif provider == 'openai':
-            api_key = self.settings.get('openai_api_key')
-        elif provider == 'anthropic':
-            api_key = self.settings.get('anthropic_api_key')
-        
+
         try:
-            LOGGER.info(f'Initializing AI Provider: {provider}')
-            self.ai = AIProviderManager(provider, api_key, experience_years=experience_years)
+            LOGGER.info('Initializing AI Provider: Google Search AI Mode')
+            self.ai = AIProviderManager(provider, None, experience_years=experience_years)
         except Exception as e:
             self.ai = None
             LOGGER.error(f'AI Provider initialization failed: {e}')
@@ -145,7 +138,7 @@ class VoiceAssistant:
     def _process_audio(self):
         # Record using VAD-based endpoint detection (blocking up to max seconds)
         from config import MAX_RECORDING_SECONDS, ULTRA_FAST_MODE
-        trimmed, full = self.audio.record(max_seconds=MAX_RECORDING_SECONDS)  # Ultra-fast: 3 seconds max
+        trimmed, full = self.audio.record(max_seconds=MAX_RECORDING_SECONDS)  # Slightly longer window to capture full questions
         
         if full:
             self.ui.set_status("⏳ Transcribing...")

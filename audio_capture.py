@@ -22,7 +22,7 @@ class AudioCapture:
         self.frame_bytes = int(self.sample_rate * (self.chunk_ms / 1000.0)) * 2
         self.noise_threshold = VAD_ENERGY_THRESHOLD
         self.vad = None
-        self.silence_timeout_seconds = 2.5
+        self.silence_timeout_seconds = 3.2
         if webrtcvad is not None:
             try:
                 self.vad = webrtcvad.Vad(2)

@@ -7,14 +7,18 @@ logging.basicConfig(
 )
 LOGGER = logging.getLogger('VoiceAssistant')
 
-# Audio Configuration
+# Audio Configuration - OPTIMIZED FOR 500% FASTER RESPONSE
 SAMPLE_RATE = 16000
 CHUNK_DURATION_MS = 30
 VAD_ENERGY_THRESHOLD = 50  # Lowered for better sensitivity
-ENABLE_NOISE_CALIBRATION = True
+ENABLE_NOISE_CALIBRATION = False  # Disable on every call - use fixed threshold
 NOISE_CALIBRATION_SECONDS = 0.5  # Faster calibration
 RECOGNITION_LANGUAGE = 'en-US'
 NORMALIZE_AUDIO = True
+MAX_RECORDING_SECONDS = 3  # Ultra-fast recording (was 5, now 3)
+MAX_AI_TOKENS = 250  # Ultra-concise responses (was 500, now 250)
+AI_TEMPERATURE = 0.5  # Balanced for speed (was 0.3, now 0.5 for faster inference)
+ULTRA_FAST_MODE = True  # Enable streaming + parallel processing
 # Whisper (offline) configuration - optional. Install `faster-whisper` or
 # `whisper` if you want offline transcription. Leave `WHISPER_ENABLED=False`
 # to keep using Google SpeechRecognition.

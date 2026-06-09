@@ -2,6 +2,84 @@ import requests
 import json
 from config import LOGGER
 
+# ULTIMATE INTERVIEW COPILOT PROMPTS
+INTERVIEW_PROMPTS = {
+    "master": """You are an INTERVIEW COPILOT - an ultra-fast expert assistant designed to help during live technical interviews.
+
+⚡ CRITICAL RULES:
+1. Respond INSTANTLY without overthinking
+2. Be CONCISE - max 2-3 sentences for quick answers
+3. If asked for details, keep each bullet point under 15 words
+4. For coding: Show only ESSENTIAL code snippet (5-10 lines max)
+5. NO EXPLANATIONS unless asked - just the answer
+6. Use bullet points for multiple concepts
+7. For follow-ups: Ask 1-2 clarifying questions max
+
+📌 INTERVIEW CONTEXT:
+- Questions are from technical interviewers
+- Candidate needs FAST, ACTIONABLE answers
+- Accuracy > Length - better to be concise than verbose
+- Focus on PRACTICAL examples over theory
+
+🎯 ANSWER FORMAT:
+[Direct Answer - 1-2 sentences]
+[Key Points - if needed]
+[Optional: One concrete example]
+
+Help the candidate think through the answer while staying authentic.""",
+    
+    "quick_tech": """You are a lightning-fast technical interview assistant.
+
+TASK: Answer the interview question INSTANTLY with practical, accurate information.
+
+RULES:
+- Answer in under 30 words for quick questions
+- Use examples for complex topics
+- Be specific, not generic
+- One concept per bullet point
+- No filler or explanations unless asked
+
+ANSWER DIRECTLY.""",
+    
+    "coding": """You are an expert coding interview assistant.
+
+TASK: Solve the coding problem concisely and clearly.
+
+RULES:
+- Give brief explanation (1 sentence)
+- Provide solution code (5-10 lines max)
+- Include complexity: O(?) time and space
+- Make code runnable and correct
+- Explain the approach if needed
+
+FOCUS: Correctness and clarity, not verbosity.""",
+    
+    "behavioral": """You are a behavioral interview coach.
+
+TASK: Help craft a STAR method response (< 30 seconds when spoken).
+
+RULES:
+- Situation: 1-2 sentences (the context)
+- Task: 1 sentence (what needed doing)
+- Action: 1-2 sentences (what you did)
+- Result: 1 sentence (what happened)
+
+Make it authentic and concise. No memorized answers.""",
+    
+    "system_design": """You are a system design expert for interviews.
+
+TASK: Provide a high-level architecture design.
+
+RULES:
+- High-level overview (not implementation)
+- 3-4 key components
+- Key trade-offs
+- Scalability considerations
+- Be practical, not theoretical
+
+FOCUS: Clear thinking and communication."""
+}
+
 class AIProviderManager:
     def __init__(self, provider="groq", api_key=None):
         self.provider = provider
@@ -10,6 +88,25 @@ class AIProviderManager:
         self.session.headers.update({
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
         })
+    
+    def _get_prompt_type(self, text):
+        """Detect question type and return appropriate interview prompt"""
+        text_lower = text.lower()
+        
+        # Coding challenge keywords
+        if any(word in text_lower for word in ['write', 'code', 'function', 'algorithm', 'reverse', 'sort', 'implement', 'program']):
+            return INTERVIEW_PROMPTS["coding"]
+        
+        # Behavioral keywords
+        if any(word in text_lower for word in ['tell me about', 'describe', 'time you', 'experience', 'conflict', 'failure', 'challenge']):
+            return INTERVIEW_PROMPTS["behavioral"]
+        
+        # System design keywords
+        if any(word in text_lower for word in ['design', 'architecture', 'scale', 'system', 'database', 'service', 'build']):
+            return INTERVIEW_PROMPTS["system_design"]
+        
+        # Default to quick tech Q&A
+        return INTERVIEW_PROMPTS["quick_tech"]
     
     def query(self, text, callback):
         # Priority order: Groq (fast & accurate) -> OpenAI -> Anthropic -> Free alternatives
@@ -40,12 +137,16 @@ class AIProviderManager:
         return self._query_google(text, callback)
     
     def _query_groq(self, text, callback):
-        """Use Groq's fast and accurate Llama models"""
+        """Use Groq's fast and accurate Llama models with interview prompts"""
         try:
             from groq_ai_provider import GroqAIProvider
             groq_key = self.api_key if self.provider == "groq" else None
             provider = GroqAIProvider(groq_key)
-            result = provider.query(text, callback)
+            
+            # Get appropriate interview prompt based on question type
+            interview_prompt = self._get_prompt_type(text)
+            
+            result = provider.query(text, callback, system_prompt=interview_prompt)
             if result:
                 return result
         except Exception as e:
@@ -141,10 +242,19 @@ class AIProviderManager:
                 "Authorization": f"Bearer {self.api_key}",
                 "Content-Type": "application/json"
             }
+            
+            # Get appropriate interview prompt based on question type
+            interview_prompt = self._get_prompt_type(text)
+            
             data = {
                 "model": "gpt-3.5-turbo",
-                "messages": [{"role": "user", "content": text}],
-                "stream": True
+                "messages": [
+                    {"role": "system", "content": interview_prompt},
+                    {"role": "user", "content": text}
+                ],
+                "stream": True,
+                "temperature": 0.3,
+                "max_tokens": 500
             }
             
             response = self.session.post(url, headers=headers, json=data, stream=True)

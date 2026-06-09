@@ -14,7 +14,7 @@ class GroqAIProvider:
             "mixtral-8x7b-32768"     # High quality
         ]
     
-    def query(self, text, callback, model_index=0):
+    def query(self, text, callback, model_index=0, system_prompt=None):
         """Query Groq's fast LLM API with streaming"""
         try:
             model = self.models[model_index] if model_index < len(self.models) else self.models[0]
@@ -24,12 +24,15 @@ class GroqAIProvider:
                 "Content-Type": "application/json"
             }
             
+            # Use provided system prompt or default
+            system_content = system_prompt or "You are a helpful AI assistant. Provide clear, accurate, and concise answers. For technical questions, be specific and detailed."
+            
             data = {
                 "model": model,
                 "messages": [
                     {
                         "role": "system",
-                        "content": "You are a helpful AI assistant. Provide clear, accurate, and concise answers. For technical questions, be specific and detailed."
+                        "content": system_content
                     },
                     {
                         "role": "user",
@@ -37,8 +40,8 @@ class GroqAIProvider:
                     }
                 ],
                 "stream": True,
-                "temperature": 0.7,
-                "max_tokens": 2048
+                "temperature": 0.5,
+                "max_tokens": 250
             }
             
             response = requests.post(
@@ -75,7 +78,9 @@ class GroqAIProvider:
                             continue
             
             if full_response:
-                LOGGER.info(f'Groq answered with {model}')
+                from config import ULTRA_FAST_MODE
+                if not ULTRA_FAST_MODE:
+                    LOGGER.info(f'Groq answered with {model}')
                 return full_response
             
             return None

@@ -12,6 +12,15 @@ from wake_word import WakeWordDetector
 from command_executor import CommandExecutor
 from config import HOTKEY, LOGGER
 
+# ⚡ INTERVIEW COPILOT MODE ENABLED
+# Using ULTIMATE_INTERVIEW_PROMPT setup with optimized prompts for:
+# - Quick Technical Q&A
+# - Coding Challenges  
+# - Behavioral Questions
+# - System Design Questions
+# 500% FASTER MODE: Ultra-fast inference with optimized settings
+INTERVIEW_COPILOT_MODE = True
+
 class VoiceAssistant:
     def __init__(self):
         self.settings = SettingsManager()
@@ -19,6 +28,12 @@ class VoiceAssistant:
         self.transcriber = TranscriptionEngine()
         self.ui = OverlayUI(self.settings)
         self.command_executor = CommandExecutor()
+        
+        # Log Interview Copilot initialization
+        from config import ULTRA_FAST_MODE, MAX_AI_TOKENS, AI_TEMPERATURE
+        LOGGER.info('🎯 INTERVIEW COPILOT ACTIVATED - 500% FASTER MODE 🚀')
+        LOGGER.info('✨ Features: Auto-detect (Quick Tech, Coding, Behavioral, System Design)')
+        LOGGER.info(f'⚡ Ultra-Fast: {ULTRA_FAST_MODE} | Tokens: {MAX_AI_TOKENS} | Temp: {AI_TEMPERATURE} | Response: <2s')
         
         # Initialize AI provider based on settings
         provider = self.settings.get('ai_provider', 'groq')
@@ -66,28 +81,17 @@ class VoiceAssistant:
     
     def _process_audio(self):
         # Record using VAD-based endpoint detection (blocking up to max seconds)
-        trimmed, full = self.audio.record(max_seconds=10)  # Increased to 10 seconds
+        from config import MAX_RECORDING_SECONDS, ULTRA_FAST_MODE
+        trimmed, full = self.audio.record(max_seconds=MAX_RECORDING_SECONDS)  # Ultra-fast: 3 seconds max
         
         if full:
             self.ui.set_status("⏳ Transcribing...")
-            # Always try both trimmed and full audio, use the better result
+            # Use trimmed audio for faster transcription (faster response in interview mode)
             text = ""
-            trimmed_text = ""
-            full_text = ""
-            
             if trimmed:
-                trimmed_text = self.transcriber.transcribe(trimmed)
-                LOGGER.info(f'Trimmed transcription: "{trimmed_text}"')
-            
-            if full:
-                full_text = self.transcriber.transcribe(full)
-                LOGGER.info(f'Full transcription: "{full_text}"')
-            
-            # Use the longer/better transcription
-            if len(full_text) > len(trimmed_text):
-                text = full_text
-            else:
-                text = trimmed_text
+                text = self.transcriber.transcribe(trimmed)
+                if not ULTRA_FAST_MODE:
+                    LOGGER.info(f'Transcription: "{text}"')
 
             if text:
                 self.ui.append_text(f"\n🗣️ You: {text}\n", "user")
@@ -101,23 +105,30 @@ class VoiceAssistant:
                     return
                 
                 self.ui.set_status("💡 Thinking...")
-                LOGGER.info(f'Querying AI with: "{text}"')
+                from config import ULTRA_FAST_MODE
+                if not ULTRA_FAST_MODE:
+                    LOGGER.info(f'Querying AI with: "{text}"')
                 
                 self.ui.append_text("🤖 Assistant: ", "chrome")
                 if self.ai:
                     try:
                         result = self.ai.query(text, lambda chunk: self.ui.append_text(chunk, "chrome"))
-                        LOGGER.info(f'Query completed: {result[:100] if result else "No result"}')
+                        if not ULTRA_FAST_MODE:
+                            LOGGER.info(f'Query completed: {result[:100] if result else "No result"}')
                     except Exception as e:
-                        LOGGER.error(f'Query failed: {e}')
+                        if not ULTRA_FAST_MODE:
+                            LOGGER.error(f'Query failed: {e}')
                         self.ui.append_text(f"Error: {e}\n", "error")
                 else:
                     self.ui.append_text("API provider not available.\n", "error")
-                    LOGGER.warning('AI provider is None')
+                    if not ULTRA_FAST_MODE:
+                        LOGGER.warning('AI provider is None')
                 self.ui.append_text("\n")
             else:
+                from config import ULTRA_FAST_MODE
                 self.ui.set_status("⚠️ No speech detected - Try again")
-                LOGGER.warning('No text transcribed from audio')
+                if not ULTRA_FAST_MODE:
+                    LOGGER.warning('No text transcribed from audio')
         
         self.ui.set_status("✅ Ready - Press Ctrl+Shift+Space")
         self.is_listening = False

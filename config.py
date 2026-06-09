@@ -15,7 +15,7 @@ ENABLE_NOISE_CALIBRATION = False  # Disable on every call - use fixed threshold
 NOISE_CALIBRATION_SECONDS = 0.5  # Faster calibration
 RECOGNITION_LANGUAGE = 'en-US'
 NORMALIZE_AUDIO = True
-MAX_RECORDING_SECONDS = 3  # Ultra-fast recording (was 5, now 3)
+MAX_RECORDING_SECONDS = 6  # Give the user time to finish longer questions
 MAX_AI_TOKENS = 250  # Ultra-concise responses (was 500, now 250)
 AI_TEMPERATURE = 0.5  # Balanced for speed (was 0.3, now 0.5 for faster inference)
 ULTRA_FAST_MODE = True  # Enable streaming + parallel processing
@@ -27,6 +27,9 @@ WHISPER_ENABLED = False
 WHISPER_BACKEND = 'faster_whisper'
 # Model size/path to load (e.g. 'small', 'base', or local path)
 WHISPER_MODEL = 'small'
+# If Google speech recognition reports a confidence lower than this,
+# treat the result as unreliable and ask the user to repeat.
+TRANSCRIPTION_CONFIDENCE_THRESHOLD = 0.60
 
 # Hotkey Configuration
 HOTKEY = "<ctrl>+<shift>+<space>"
@@ -37,6 +40,7 @@ WAKE_WORD_ENABLED = False
 COMPACT_MODE = False
 WINDOW_OPACITY = 0.95
 PUSH_TO_TALK = True  # Use push-to-talk like Parakeet AI
+DEVOPS_COACH_MODE = True
 
 # Chrome / Selenium configuration
 # Set to True to run Chrome in headless mode by default. Some environments

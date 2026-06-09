@@ -1,8 +1,69 @@
 import threading
 import time
-from pynput import keyboard
-from pystray import Icon, Menu, MenuItem
 from PIL import Image, ImageDraw
+
+try:
+    from pynput import keyboard
+except Exception:
+    class _DummyHotKey:
+        @staticmethod
+        def parse(_hotkey):
+            return _hotkey
+
+        def __init__(self, _hotkey, on_activate):
+            self._on_activate = on_activate
+
+        def press(self, _key):
+            return None
+
+        def release(self, _key):
+            return None
+
+    class _DummyListener:
+        def __init__(self, on_press=None, on_release=None):
+            self.on_press = on_press
+            self.on_release = on_release
+
+        def canonical(self, key):
+            return key
+
+        def start(self):
+            LOGGER.warning("pynput is unavailable; hotkey support is disabled.")
+
+        def stop(self):
+            return None
+
+    class _KeyboardFallback:
+        HotKey = _DummyHotKey
+        Listener = _DummyListener
+
+    keyboard = _KeyboardFallback()
+
+try:
+    from pystray import Icon, Menu, MenuItem
+except Exception:
+    class MenuItem:
+        def __init__(self, text, action):
+            self.text = text
+            self.action = action
+
+    class Menu(list):
+        def __init__(self, *items):
+            super().__init__(items)
+
+    class Icon:
+        def __init__(self, name, image, title, menu):
+            self.name = name
+            self.image = image
+            self.title = title
+            self.menu = menu
+
+        def run(self):
+            LOGGER.warning("pystray is unavailable; tray icon is disabled.")
+
+        def stop(self):
+            return None
+
 from audio_capture import AudioCapture
 from transcription import TranscriptionEngine
 from ai_provider import AIProviderManager
@@ -37,6 +98,7 @@ class VoiceAssistant:
         
         # Initialize AI provider based on settings
         provider = self.settings.get('ai_provider', 'groq')
+        experience_years = self.settings.get('target_experience_years', 5)
         api_key = None
         if provider == 'groq':
             api_key = self.settings.get('groq_api_key')
@@ -47,7 +109,7 @@ class VoiceAssistant:
         
         try:
             LOGGER.info(f'Initializing AI Provider: {provider}')
-            self.ai = AIProviderManager(provider, api_key)
+            self.ai = AIProviderManager(provider, api_key, experience_years=experience_years)
         except Exception as e:
             self.ai = None
             LOGGER.error(f'AI Provider initialization failed: {e}')
@@ -59,6 +121,7 @@ class VoiceAssistant:
         self.is_listening = False
         self.tray_icon = None
         self.wake_word_detector = None
+        self.hotkey_listener = None
     
     def toggle_listening(self):
         if not self.is_listening:
@@ -115,6 +178,8 @@ class VoiceAssistant:
                         result = self.ai.query(text, lambda chunk: self.ui.append_text(chunk, "chrome"))
                         if not ULTRA_FAST_MODE:
                             LOGGER.info(f'Query completed: {result[:100] if result else "No result"}')
+                        if not result:
+                            self.ui.append_text("I couldn't generate a response right now.\n", "error")
                     except Exception as e:
                         if not ULTRA_FAST_MODE:
                             LOGGER.error(f'Query failed: {e}')
@@ -173,11 +238,17 @@ class VoiceAssistant:
             on_release=for_canonical(hotkey.release)
         )
         listener.start()
+        self.hotkey_listener = listener
     
     def quit(self):
         LOGGER.info('Shutting down Voice Assistant')
         if self.wake_word_detector:
             self.wake_word_detector.stop()
+        if self.hotkey_listener:
+            try:
+                self.hotkey_listener.stop()
+            except Exception as e:
+                LOGGER.warning(f'Error stopping hotkey listener: {e}')
         if self.ai:
             try:
                 if hasattr(self.ai, 'close'):

@@ -22,7 +22,8 @@ class SettingsManager:
             "theme": "dark",
             "voice_feedback": False,
             "openai_api_key": "",
-            "anthropic_api_key": ""
+            "anthropic_api_key": "",
+            "target_experience_years": 5
         }
         
         if os.path.exists(self.settings_file):

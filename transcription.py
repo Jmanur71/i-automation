@@ -47,6 +47,7 @@ class TranscriptionEngine:
         self._whisper_model = None
         self._corrections = [
             ("stateful state", "stateful set"),
+            ("state full set", "stateful set"),
             ("c i c d", "ci/cd"),
             ("cicd", "ci/cd"),
             ("v p c", "vpc"),
@@ -159,6 +160,8 @@ class TranscriptionEngine:
         # Very common ASR confusion in interview questions.
         if "stateful state" in lowered and "stateful set" not in lowered:
             text = self._replace_case_insensitive(text, "stateful state", "stateful set")
+        if "state full set" in lowered and "stateful set" not in lowered:
+            text = self._replace_case_insensitive(text, "state full set", "stateful set")
 
         return text
 

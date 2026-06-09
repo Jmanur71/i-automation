@@ -44,6 +44,8 @@ def _variants(
 
 def _normalize(text: str) -> str:
     text = text.lower().strip()
+    text = text.replace("state full set", "stateful set")
+    text = text.replace("state full", "stateful")
     text = re.sub(r"[^a-z0-9/+\-\s]", " ", text)
     text = re.sub(r"\s+", " ", text)
     return text
@@ -96,6 +98,9 @@ class KnowledgeEntry:
     def score(self, question: str) -> int:
         q = _normalize(question)
         score = 0
+
+        if self.id == "DEVOPS-001" and not re.search(r"^(what is|what's|whats|define|explain|tell me about)\s+devops\b", q):
+            return 0
 
         for alias in self.aliases:
             alias_norm = _normalize(alias)
@@ -195,6 +200,39 @@ DEFAULT_ENTRIES: Tuple[KnowledgeEntry, ...] = (
             ],
         ),
         source_reference=(SOURCE_ROADMAP, SOURCE_GITHUB_DEVOPS_EXERCISES),
+    ),
+    KnowledgeEntry(
+        id="DEVOPS-001",
+        category="Core Principles",
+        tool="DevOps",
+        type="Concept",
+        difficulty_target="Junior to Principal",
+        question="What is DevOps?",
+        keywords=("culture", "collaboration", "automation", "ci/cd", "sre", "shared responsibility"),
+        aliases=("devops", "what is devops", "define devops", "explain devops"),
+        answer_variants=_variants(
+            junior=[
+                "DevOps is a culture and practice that brings development and operations together.",
+                "It improves collaboration, automation, and delivery speed.",
+                "Example: developers and ops share ownership of build, deploy, and monitoring.",
+            ],
+            mid=[
+                "DevOps combines culture, automation, and shared ownership to deliver software faster and safer.",
+                "It typically includes CI/CD, infrastructure as code, and observability.",
+                "Example: one team owns build, release, and incident feedback loops.",
+            ],
+            senior=[
+                "DevOps is an operating model for shortening feedback loops and improving reliability.",
+                "It aligns engineering, operations, and security around measurable delivery outcomes.",
+                "Example: standardize pipelines, platform guardrails, and production telemetry.",
+            ],
+            principal=[
+                "DevOps is an organizational capability that connects product delivery to business outcomes.",
+                "At scale, it drives platform engineering, governance, and engineering effectiveness.",
+                "Example: self-service platforms with policy, automation, and SLO-based operations.",
+            ],
+        ),
+        source_reference=(SOURCE_ROADMAP, SOURCE_DEVOPS_ROADMAP),
     ),
     KnowledgeEntry(
         id="CICD-001",
@@ -357,6 +395,45 @@ DEFAULT_ENTRIES: Tuple[KnowledgeEntry, ...] = (
                 "Deployment is the lifecycle contract exposed to teams; ReplicaSet is an implementation detail.",
                 "Standardize on Deployment to reduce operational complexity and improve governance.",
                 "Avoid direct ReplicaSet management unless you are building platform internals.",
+            ],
+        ),
+        source_reference=(SOURCE_GITHUB_INTERVIEWS, SOURCE_ROADMAP),
+    ),
+    KnowledgeEntry(
+        id="K8S-006",
+        category="Orchestration",
+        tool="Kubernetes Deployment vs StatefulSet",
+        type="Comparison",
+        difficulty_target="Mid to Senior",
+        question="What is the difference between Kubernetes Deployment and StatefulSet?",
+        keywords=("deployment", "statefulset", "stateful set", "ordered", "stable identity", "persistent storage"),
+        aliases=(
+            "difference between kubernetes deployment and statefulset",
+            "deployment vs statefulset",
+            "deployment and statefulset",
+            "deployment stateful set",
+            "state full set",
+        ),
+        answer_variants=_variants(
+            junior=[
+                "Deployment is for stateless apps; StatefulSet is for stateful apps.",
+                "Deployment gives flexible pod replacement; StatefulSet keeps stable identities.",
+                "Example: use Deployment for web apps and StatefulSet for databases.",
+            ],
+            mid=[
+                "Deployment manages interchangeable pods; StatefulSet manages ordered, sticky pods.",
+                "StatefulSet keeps stable network identity and persistent volume claims.",
+                "Example: use StatefulSet for PostgreSQL or Kafka, Deployment for APIs.",
+            ],
+            senior=[
+                "Deployment is optimized for horizontally scalable stateless workloads.",
+                "StatefulSet is optimized for ordered rollout, stable identity, and storage retention.",
+                "Example: choose StatefulSet when pod identity and volume association must persist.",
+            ],
+            principal=[
+                "The architectural difference is whether workload identity is disposable or durable.",
+                "Deployment fits stateless service tiers; StatefulSet fits systems with identity and storage coupling.",
+                "Example: platform standards should route each workload class to the correct controller.",
             ],
         ),
         source_reference=(SOURCE_GITHUB_INTERVIEWS, SOURCE_ROADMAP),

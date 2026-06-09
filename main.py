@@ -5,29 +5,46 @@ from pystray import Icon, Menu, MenuItem
 from PIL import Image, ImageDraw
 from audio_capture import AudioCapture
 from transcription import TranscriptionEngine
-from llm_client import ChromeClient
+from ai_provider import AIProviderManager
 from overlay_ui import OverlayUI
+from settings_manager import SettingsManager
+from wake_word import WakeWordDetector
+from command_executor import CommandExecutor
 from config import HOTKEY, LOGGER
 
 class VoiceAssistant:
     def __init__(self):
+        self.settings = SettingsManager()
         self.audio = AudioCapture()
         self.transcriber = TranscriptionEngine()
-        self.ui = OverlayUI()
+        self.ui = OverlayUI(self.settings)
+        self.command_executor = CommandExecutor()
+        
+        # Initialize AI provider based on settings
+        provider = self.settings.get('ai_provider', 'groq')
+        api_key = None
+        if provider == 'groq':
+            api_key = self.settings.get('groq_api_key')
+        elif provider == 'openai':
+            api_key = self.settings.get('openai_api_key')
+        elif provider == 'anthropic':
+            api_key = self.settings.get('anthropic_api_key')
+        
         try:
-            LOGGER.info('Initializing ChromeClient')
-            self.chrome = ChromeClient()
+            LOGGER.info(f'Initializing AI Provider: {provider}')
+            self.ai = AIProviderManager(provider, api_key)
         except Exception as e:
-            # Surface error to UI and continue without chrome client
-            self.chrome = None
-            LOGGER.error(f'ChromeClient initialization failed: {e}')
+            self.ai = None
+            LOGGER.error(f'AI Provider initialization failed: {e}')
             try:
-                self.ui.append_text(f"[Error] ChromeClient init failed: {e}\n")
+                self.ui.append_text(f"[Error] AI init failed: {e}\n")
             except Exception:
-                LOGGER.error(f'Failed to display ChromeClient error in UI: {e}')
+                LOGGER.error(f'Failed to display AI error in UI: {e}')
+        
         self.is_listening = False
         self.tray_icon = None
-        
+        self.wake_word_detector = None
+    
     def toggle_listening(self):
         if not self.is_listening:
             self.start_listening()
@@ -49,33 +66,60 @@ class VoiceAssistant:
     
     def _process_audio(self):
         # Record using VAD-based endpoint detection (blocking up to max seconds)
-        trimmed, full = self.audio.record(max_seconds=10)
+        trimmed, full = self.audio.record(max_seconds=10)  # Increased to 10 seconds
         
         if full:
-            self.ui.set_status("Transcribing...")
-            # Prefer trimmed audio when available, but fall back to full if
-            # trimmed transcription is empty or very short.
+            self.ui.set_status("⏳ Transcribing...")
+            # Always try both trimmed and full audio, use the better result
             text = ""
+            trimmed_text = ""
+            full_text = ""
+            
             if trimmed:
-                text = self.transcriber.transcribe(trimmed)
-            if not text or len(text.split()) < 3:
-                # try full audio as fallback
-                alt = self.transcriber.transcribe(full)
-                if alt and len(alt.split()) > len(text.split()):
-                    text = alt
+                trimmed_text = self.transcriber.transcribe(trimmed)
+                LOGGER.info(f'Trimmed transcription: "{trimmed_text}"')
+            
+            if full:
+                full_text = self.transcriber.transcribe(full)
+                LOGGER.info(f'Full transcription: "{full_text}"')
+            
+            # Use the longer/better transcription
+            if len(full_text) > len(trimmed_text):
+                text = full_text
+            else:
+                text = trimmed_text
 
             if text:
-                self.ui.append_text(f"\n[You]: {text}\n")
-                self.ui.set_status("Searching Chrome...")
+                self.ui.append_text(f"\n🗣️ You: {text}\n", "user")
                 
-                self.ui.append_text("[Chrome]: ")
-                if self.chrome:
-                    self.chrome.query(text, lambda chunk: self.ui.append_text(chunk))
+                # Try to execute as command first
+                cmd_result = self.command_executor.execute(text)
+                if cmd_result:
+                    self.ui.append_text(f"✅ {cmd_result}\n\n", "chrome")
+                    self.ui.set_status("✅ Ready - Press Ctrl+Shift+Space")
+                    self.is_listening = False
+                    return
+                
+                self.ui.set_status("💡 Thinking...")
+                LOGGER.info(f'Querying AI with: "{text}"')
+                
+                self.ui.append_text("🤖 Assistant: ", "chrome")
+                if self.ai:
+                    try:
+                        result = self.ai.query(text, lambda chunk: self.ui.append_text(chunk, "chrome"))
+                        LOGGER.info(f'Query completed: {result[:100] if result else "No result"}')
+                    except Exception as e:
+                        LOGGER.error(f'Query failed: {e}')
+                        self.ui.append_text(f"Error: {e}\n", "error")
                 else:
-                    self.ui.append_text("Chrome client not available.\n")
+                    self.ui.append_text("API provider not available.\n", "error")
+                    LOGGER.warning('AI provider is None')
                 self.ui.append_text("\n")
+            else:
+                self.ui.set_status("⚠️ No speech detected - Try again")
+                LOGGER.warning('No text transcribed from audio')
         
-        self.ui.set_status("Ready")
+        self.ui.set_status("✅ Ready - Press Ctrl+Shift+Space")
         self.is_listening = False
     
     def create_tray_icon(self):
@@ -85,6 +129,8 @@ class VoiceAssistant:
         
         menu = Menu(
             MenuItem('Toggle Window', lambda: self.ui.toggle_visibility()),
+            MenuItem('Toggle Compact Mode', lambda: self.toggle_compact_mode()),
+            MenuItem('Settings', lambda: self.ui.open_settings()),
             MenuItem('Hide from Capture', lambda: self.ui.hide_from_capture()),
             MenuItem('Show Normal', lambda: self.ui.show_normal()),
             MenuItem('Clear Chat', lambda: self.ui.clear()),
@@ -93,6 +139,11 @@ class VoiceAssistant:
         
         self.tray_icon = Icon("VoiceAssistant", image, "Voice Assistant", menu)
         threading.Thread(target=self.tray_icon.run, daemon=True).start()
+    
+    def toggle_compact_mode(self):
+        current = self.settings.get('compact_mode', False)
+        self.settings.set('compact_mode', not current)
+        LOGGER.info(f'Compact mode: {not current}. Restart app to apply.')
     
     def setup_hotkey(self):
         def on_activate():
@@ -114,11 +165,14 @@ class VoiceAssistant:
     
     def quit(self):
         LOGGER.info('Shutting down Voice Assistant')
-        if self.chrome:
+        if self.wake_word_detector:
+            self.wake_word_detector.stop()
+        if self.ai:
             try:
-                self.chrome.close()
+                if hasattr(self.ai, 'close'):
+                    self.ai.close()
             except Exception as e:
-                LOGGER.warning(f'Error closing Chrome client: {e}')
+                LOGGER.warning(f'Error closing AI provider: {e}')
         if self.tray_icon:
             try:
                 self.tray_icon.stop()
@@ -133,8 +187,8 @@ class VoiceAssistant:
         LOGGER.info('Starting Voice Assistant')
         self.create_tray_icon()
         self.setup_hotkey()
-        self.ui.set_status(f"Ready - Press {HOTKEY} to talk")
-        LOGGER.info(f'Voice Assistant ready. Hotkey: {HOTKEY}')
+        self.ui.set_status("✅ Ready - Press Ctrl+Shift+Space to talk")
+        LOGGER.info('Voice Assistant ready - Push-to-talk enabled')
         self.ui.run()
 
 if __name__ == "__main__":

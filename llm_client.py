@@ -1,220 +1,188 @@
-import logging
-import os
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from webdriver_manager.chrome import ChromeDriverManager
-
-from config import CHROME_HEADLESS, CHROME_USER_DATA_DIR, CHROME_AI_TARGET, CHROME_GOOGLE_AI_MODE, LOGGER
-
-# Ensure logs directory
-LOG_DIR = os.path.join(os.path.dirname(__file__), 'logs')
-os.makedirs(LOG_DIR, exist_ok=True)
-LOG_FILE = os.path.join(LOG_DIR, 'chrome_client.log')
-
-# Add file handler for Chrome-specific logging
-file_handler = logging.FileHandler(LOG_FILE)
-file_handler.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(asctime)s [%(levelname)s] %(message)s')
-file_handler.setFormatter(formatter)
-logging.getLogger('VoiceAssistant').addHandler(file_handler)
-
+import requests
+import json
+import time
+from config import LOGGER
 
 class ChromeClient:
-    def __init__(self, headless=None):
-        options = Options()
-
-        # headless: if None, read default from config; otherwise override
-        if headless is None:
-            headless = bool(CHROME_HEADLESS)
-        self._used_headless = headless
-        if headless:
-            options.add_argument('--headless=new')
-
-        # If a user data dir is provided, persist profile to enable signed-in AI flows
-        if CHROME_USER_DATA_DIR:
-            options.add_argument(f'--user-data-dir={CHROME_USER_DATA_DIR}')
-
-        options.add_argument('--start-maximized')
-        options.add_experimental_option('excludeSwitches', ['enable-logging'])
-        options.add_argument('--disable-blink-features=AutomationControlled')
-
-        service = Service(ChromeDriverManager().install())
-        try:
-            LOGGER.info('Launching Chrome (headless=%s)', self._used_headless)
-            self.driver = webdriver.Chrome(service=service, options=options)
-        except Exception as e:
-            # If headless mode fails on this environment, retry without headless
-            LOGGER.exception('Initial Chrome launch failed')
-            if self._used_headless:
-                try:
-                    LOGGER.info('Attempting fallback to non-headless Chrome')
-                    options = Options()
-                    if CHROME_USER_DATA_DIR:
-                        options.add_argument(f'--user-data-dir={CHROME_USER_DATA_DIR}')
-                    options.add_argument('--start-maximized')
-                    options.add_experimental_option('excludeSwitches', ['enable-logging'])
-                    options.add_argument('--disable-blink-features=AutomationControlled')
-                    self.driver = webdriver.Chrome(service=service, options=options)
-                    self._used_headless = False
-                    LOGGER.warning('Fell back to non-headless Chrome')
-                except Exception:
-                    LOGGER.exception('Fallback launch also failed')
-                    raise
-            else:
-                raise
-
-        self.wait = WebDriverWait(self.driver, 12)
-        self._retried_fallback = False
-
-    def _activate_google_ai_mode(self):
-        selectors = [
-            "//a[normalize-space()='AI Mode']",
-            "//button[normalize-space()='AI Mode']",
-            "//div[normalize-space()='AI Mode']",
-            "//*[contains(@aria-label, 'AI Mode') or contains(@aria-label, 'AI mode') or contains(@aria-label, 'AI-mode')]"
-        ]
-        for selector in selectors:
-            try:
-                el = self.wait.until(EC.element_to_be_clickable((By.XPATH, selector)))
-                LOGGER.info('AI Mode selector found: %s', selector)
-                el.click()
-                # Wait for the AI content region to appear.
-                self.wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'div[role="main"], div[data-attrid="wa:/description"], div.VwiC3b')))
-                LOGGER.info('Switched to Google AI Mode')
-                return True
-            except Exception as exc:
-                LOGGER.debug('AI Mode selector not found for %s: %s', selector, exc)
-                continue
-        LOGGER.info('Google AI Mode selector not found, staying on standard results')
-        return False
-
+    def __init__(self):
+        LOGGER.info('Initializing AI client')
+        self.session = requests.Session()
+        self.session.headers.update({
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        })
+        self.last_request_time = 0
+        
     def query(self, text, callback):
         try:
-            # Determine target URL based on AI target
-            if CHROME_AI_TARGET == 'bard':
-                target_url = 'https://bard.google.com/'
+            LOGGER.info(f'Getting answer for: "{text}"')
+            
+            answer = None
+            
+            # 1. Try Wikipedia
+            answer = self._try_wikipedia(text)
+            
+            # 2. Try DuckDuckGo
+            if not answer:
+                answer = self._try_duckduckgo(text)
+            
+            # 3. Try alternative Wikipedia search
+            if not answer:
+                answer = self._try_wikipedia_alternative(text)
+            
+            if not answer:
+                answer = "I couldn't find a clear answer. Try rephrasing your question."
+                LOGGER.warning('No answer found from any source')
             else:
-                target_url = 'https://www.google.com'
-
-            LOGGER.info('Navigating to %s', target_url)
-            self.driver.get(target_url)
-
-            # Locate input depending on target
-            search_box = None
-            # Special check for Bard: it generally requires a signed-in session.
-            if CHROME_AI_TARGET == 'bard':
-                try:
-                    # quick presence check for an editable area
-                    self.wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'textarea, [contenteditable="true"]')))
-                except Exception:
-                    msg = 'AI target appears to require sign-in (e.g. Bard). Please sign into the configured Chrome profile.'
-                    LOGGER.warning(msg)
-                    try:
-                        callback(msg)
-                    except Exception:
-                        pass
-                    return msg
-            if CHROME_AI_TARGET == 'google':
-                search_box = self.wait.until(EC.presence_of_element_located((By.NAME, 'q')))
-                search_box.clear()
-                search_box.send_keys(text)
-                search_box.send_keys(Keys.RETURN)
-                # Wait for Google search results
-                self.wait.until(EC.presence_of_element_located((By.ID, 'search')))
-                if CHROME_GOOGLE_AI_MODE:
-                    self._activate_google_ai_mode()
-            else:
-                # Generic attempt for AI interfaces (may require signed-in session)
-                try:
-                    search_box = self.wait.until(
-                        EC.presence_of_element_located((By.CSS_SELECTOR, 'textarea, [contenteditable="true"]'))
-                    )
-                    search_box.clear()
-                    search_box.send_keys(text)
-                    search_box.send_keys(Keys.RETURN)
-                except Exception:
-                    LOGGER.warning('Could not find AI input element on target; proceeding to scrape page')
-
-            # Try to extract a featured snippet or the first result text
-            snippet = ''
-            selectors = [
-                'div[data-attrid="wa:/description"]',
-                'div.ifM9O',
-                'div.VwiC3b'
-            ]
-            for sel in selectors:
-                try:
-                    elem = self.driver.find_element(By.CSS_SELECTOR, sel)
-                    snippet = elem.text.strip()
-                    if snippet:
-                        break
-                except Exception:
-                    continue
-
-            if not snippet:
-                try:
-                    first_result = self.driver.find_element(By.CSS_SELECTOR, 'div#search .g')
-                    snippet = first_result.text.strip()
-                except Exception:
-                    snippet = 'No clear answer found. Check Chrome window for results.'
-
-            callback(snippet)
-            return snippet
-
+                LOGGER.info(f'Answer found: {answer[:100]}...')
+            
+            # Stream the answer
+            words = answer.split()
+            for i, word in enumerate(words):
+                if i == 0:
+                    callback(word)
+                else:
+                    callback(' ' + word)
+            
+            return answer
+            
         except Exception as e:
-            LOGGER.exception('Query failed, evaluating fallback')
-            # If headless mode failed at runtime, try once with non-headless driver
-            if getattr(self, '_used_headless', False) and not getattr(self, '_retried_fallback', False):
-                self._retried_fallback = True
-                try:
-                    try:
-                        self.driver.quit()
-                    except Exception:
-                        pass
-
-                    service = Service(ChromeDriverManager().install())
-                    options = Options()
-                    if CHROME_USER_DATA_DIR:
-                        options.add_argument(f'--user-data-dir={CHROME_USER_DATA_DIR}')
-                    options.add_argument('--start-maximized')
-                    options.add_experimental_option('excludeSwitches', ['enable-logging'])
-                    options.add_argument('--disable-blink-features=AutomationControlled')
-                    logging.info('Retrying with non-headless Chrome')
-                    self.driver = webdriver.Chrome(service=service, options=options)
-                    self.wait = WebDriverWait(self.driver, 12)
-                    return self.query(text, callback)
-                except Exception as retry_e:
-                    LOGGER.exception('Fallback retry failed')
-                    error_msg = f'Search error after fallback: {retry_e}'
-                    try:
-                        callback(error_msg)
-                    except Exception:
-                        pass
-                    return error_msg
-            else:
-                error_msg = f'Search error: {e}'
-                try:
-                    callback(error_msg)
-                except Exception:
-                    pass
-                return error_msg
-
+            error_msg = f"Error: {str(e)}"
+            LOGGER.error(f'Query exception: {e}')
+            callback(error_msg)
+            return error_msg
+    
+    def _try_wikipedia(self, text):
+        try:
+            LOGGER.debug('Trying Wikipedia...')
+            # Search Wikipedia
+            search_url = 'https://en.wikipedia.org/w/api.php'
+            search_params = {
+                'action': 'opensearch',
+                'search': text,
+                'limit': 1,
+                'format': 'json'
+            }
+            search_response = self.session.get(search_url, params=search_params, timeout=5)
+            search_data = search_response.json()
+            
+            if len(search_data) > 1 and len(search_data[1]) > 0:
+                page_title = search_data[1][0]
+                # Get page summary
+                summary_url = f'https://en.wikipedia.org/api/rest_v1/page/summary/{page_title}'
+                summary_response = self.session.get(summary_url, timeout=5)
+                if summary_response.status_code == 200:
+                    wiki_data = summary_response.json()
+                    extract = wiki_data.get('extract', '')
+                    if extract:
+                        # Limit to first 3 sentences
+                        sentences = extract.split('. ')
+                        result = '. '.join(sentences[:3])
+                        if len(result) > 50:
+                            LOGGER.info('Wikipedia answered')
+                            return result + '.'
+        except Exception as e:
+            LOGGER.debug(f'Wikipedia failed: {e}')
+        return None
+    
+    def _try_duckduckgo(self, text):
+        try:
+            LOGGER.debug('Trying DuckDuckGo...')
+            url = 'https://api.duckduckgo.com/'
+            params = {
+                'q': text,
+                'format': 'json',
+                'no_html': 1,
+                'skip_disambig': 1
+            }
+            response = self.session.get(url, params=params, timeout=5)
+            data = response.json()
+            
+            if data.get('AbstractText'):
+                LOGGER.info('DuckDuckGo answered')
+                return data['AbstractText']
+            elif data.get('Answer'):
+                LOGGER.info('DuckDuckGo answered')
+                return data['Answer']
+            elif data.get('Definition'):
+                LOGGER.info('DuckDuckGo answered')
+                return data['Definition']
+        except Exception as e:
+            LOGGER.debug(f'DuckDuckGo failed: {e}')
+        return None
+    
+    def _try_huggingface(self, text):
+        try:
+            # Rate limiting - wait at least 2 seconds between requests
+            current_time = time.time()
+            if current_time - self.last_request_time < 2:
+                time.sleep(2 - (current_time - self.last_request_time))
+            
+            LOGGER.debug('Trying Hugging Face AI...')
+            url = 'https://api-inference.huggingface.co/models/google/flan-t5-large'
+            payload = {
+                'inputs': f'Answer concisely: {text}',
+                'parameters': {
+                    'max_length': 150,
+                    'temperature': 0.7
+                },
+                'options': {'wait_for_model': True}
+            }
+            
+            response = self.session.post(url, json=payload, timeout=20)
+            self.last_request_time = time.time()
+            
+            if response.status_code == 200:
+                result = response.json()
+                if isinstance(result, list) and len(result) > 0:
+                    answer = result[0].get('generated_text', '').strip()
+                    if answer and len(answer) > 20:
+                        LOGGER.info('Hugging Face AI answered')
+                        return answer
+            elif response.status_code == 503:
+                LOGGER.debug('Hugging Face model loading...')
+        except Exception as e:
+            LOGGER.debug(f'Hugging Face failed: {e}')
+        return None
+    
+    def _try_wikipedia_alternative(self, text):
+        try:
+            LOGGER.debug('Trying Wikipedia alternative search...')
+            # Extract key terms from question
+            key_terms = text.lower().replace('what is', '').replace('what are', '').replace('?', '').strip()
+            
+            search_url = 'https://en.wikipedia.org/w/api.php'
+            search_params = {
+                'action': 'query',
+                'list': 'search',
+                'srsearch': key_terms,
+                'format': 'json',
+                'srlimit': 1
+            }
+            search_response = self.session.get(search_url, params=search_params, timeout=5)
+            search_data = search_response.json()
+            
+            if 'query' in search_data and 'search' in search_data['query']:
+                results = search_data['query']['search']
+                if len(results) > 0:
+                    page_title = results[0]['title']
+                    summary_url = f'https://en.wikipedia.org/api/rest_v1/page/summary/{page_title}'
+                    summary_response = self.session.get(summary_url, timeout=5)
+                    if summary_response.status_code == 200:
+                        wiki_data = summary_response.json()
+                        extract = wiki_data.get('extract', '')
+                        if extract:
+                            sentences = extract.split('. ')
+                            result = '. '.join(sentences[:3])
+                            if len(result) > 50:
+                                LOGGER.info('Wikipedia alternative answered')
+                                return result + '.'
+        except Exception as e:
+            LOGGER.debug(f'Wikipedia alternative failed: {e}')
+        return None
+    
     def reset(self):
-        try:
-            self.driver.delete_all_cookies()
-        except Exception:
-            pass
-
+        pass
+    
     def close(self):
-        """Properly close Chrome WebDriver."""
-        try:
-            if hasattr(self, 'driver') and self.driver:
-                LOGGER.info('Closing Chrome WebDriver')
-                self.driver.quit()
-        except Exception as e:
-            LOGGER.warning(f'Error closing WebDriver: {e}')
+        LOGGER.info('Closing AI client')
+        self.session.close()

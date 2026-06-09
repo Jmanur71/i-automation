@@ -51,7 +51,12 @@ class TranscriptionEngine:
         try:
             with self.lock:
                 audio = sr.AudioData(audio_data, SAMPLE_RATE, 2)
-                text = self.recognizer.recognize_google(audio, language=RECOGNITION_LANGUAGE)
+                # Adjust recognizer for better accuracy
+                self.recognizer.energy_threshold = 300
+                self.recognizer.dynamic_energy_threshold = True
+                self.recognizer.pause_threshold = 0.8
+                
+                text = self.recognizer.recognize_google(audio, language=RECOGNITION_LANGUAGE, show_all=False)
                 LOGGER.info(f'Transcription successful: "{text}"')
                 return text.strip()
         except sr.UnknownValueError:

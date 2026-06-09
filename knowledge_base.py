@@ -1,0 +1,218 @@
+# Comprehensive DevOps Knowledge Base
+TECH_KB = {
+    # ==================== AWS SERVICES ====================
+    "ec2": "Amazon EC2 (Elastic Compute Cloud) provides scalable virtual servers in the cloud. You can launch instances with various configurations, operating systems, and scale up or down based on demand.",
+    "s3": "Amazon S3 (Simple Storage Service) is object storage with 99.999999999% durability. It stores and retrieves any amount of data from anywhere, commonly used for backups, data lakes, and static website hosting.",
+    "vpc": "Amazon VPC (Virtual Private Cloud) lets you create isolated networks within AWS. You control IP ranges, subnets, route tables, and network gateways for secure resource deployment.",
+    "elb": "Elastic Load Balancing distributes incoming traffic across multiple targets like EC2 instances, containers, and Lambda functions to ensure high availability and fault tolerance.",
+    "lb": "Load Balancer in AWS automatically distributes application traffic across multiple targets in multiple Availability Zones, increasing fault tolerance of your applications.",
+    "alb": "Application Load Balancer operates at Layer 7 (HTTP/HTTPS) with advanced routing, host-based and path-based routing, and native support for containerized applications.",
+    "nlb": "Network Load Balancer operates at Layer 4 (TCP/UDP) handling millions of requests per second with ultra-low latency, ideal for extreme performance requirements.",
+    "rds": "Amazon RDS (Relational Database Service) manages databases like MySQL, PostgreSQL, Oracle, SQL Server, and MariaDB with automated backups, patching, and scaling.",
+    "dynamodb": "Amazon DynamoDB is a fully managed NoSQL database with single-digit millisecond performance at any scale, supporting key-value and document data models.",
+    "lambda": "AWS Lambda runs code without provisioning servers. You pay only for compute time consumed, perfect for event-driven architectures and microservices.",
+    "iam": "AWS IAM (Identity and Access Management) controls access to AWS services securely using users, groups, roles, and policies with fine-grained permissions.",
+    "cloudwatch": "Amazon CloudWatch monitors AWS resources and applications with metrics, logs, and alarms. It provides insights for performance optimization and troubleshooting.",
+    "cloudformation": "AWS CloudFormation provisions infrastructure as code using JSON or YAML templates. It automates resource creation, updates, and deletion with version control.",
+    "auto scaling": "AWS Auto Scaling automatically adjusts compute capacity based on demand, maintaining performance while minimizing costs through dynamic scaling policies.",
+    "autoscaling": "AWS Auto Scaling monitors applications and automatically adjusts capacity to maintain steady performance at the lowest cost using scaling policies.",
+    "ecs": "Amazon ECS (Elastic Container Service) orchestrates Docker containers with deep AWS integration, supporting both EC2 and Fargate launch types.",
+    "eks": "Amazon EKS (Elastic Kubernetes Service) is managed Kubernetes service that runs upstream Kubernetes without needing to install and operate control plane.",
+    "fargate": "AWS Fargate is serverless compute for containers. You don't manage servers, just define and pay for resources per application, works with ECS and EKS.",
+    "route53": "Amazon Route 53 is scalable DNS and domain registration service with health checking and traffic routing policies for high availability.",
+    "cloudfront": "Amazon CloudFront is a CDN (Content Delivery Network) that delivers data, videos, applications, and APIs globally with low latency and high transfer speeds.",
+    "sns": "Amazon SNS (Simple Notification Service) is pub/sub messaging for microservices, distributed systems, and serverless applications with push notifications.",
+    "sqs": "Amazon SQS (Simple Queue Service) is fully managed message queuing for decoupling microservices, distributed systems, and serverless applications.",
+    "elasticache": "Amazon ElastiCache is in-memory caching service supporting Redis and Memcached for sub-millisecond latency and high throughput applications.",
+    "kinesis": "Amazon Kinesis collects, processes, and analyzes real-time streaming data at scale for video, audio, application logs, and IoT telemetry.",
+    "redshift": "Amazon Redshift is a fast, fully managed data warehouse for analyzing data using SQL and BI tools with petabyte-scale storage.",
+    "elastic beanstalk": "AWS Elastic Beanstalk deploys and scales web applications automatically. You upload code and it handles deployment, capacity, load balancing, and monitoring.",
+    "codepipeline": "AWS CodePipeline automates continuous delivery pipelines for fast and reliable application updates with integration to third-party tools.",
+    "codebuild": "AWS CodeBuild compiles source code, runs tests, and produces deployable artifacts. It scales continuously and processes multiple builds concurrently.",
+    "codedeploy": "AWS CodeDeploy automates application deployments to EC2, Lambda, ECS, and on-premises servers with rollback capabilities.",
+    "codecommit": "AWS CodeCommit is a managed source control service hosting secure Git repositories with no size limits and high availability.",
+    "secrets manager": "AWS Secrets Manager helps protect secrets needed to access applications, services, and IT resources with automatic rotation.",
+    "kms": "AWS KMS (Key Management Service) creates and controls encryption keys used to encrypt data with FIPS 140-2 validated hardware.",
+    "cloudtrail": "AWS CloudTrail logs and monitors account activity across AWS infrastructure for governance, compliance, and operational auditing.",
+    "config": "AWS Config tracks resource configurations and changes over time for compliance auditing, security analysis, and change tracking.",
+    
+    # ==================== AZURE SERVICES ====================
+    "azure vm": "Azure Virtual Machines provide on-demand scalable computing resources with support for Linux and Windows, offering flexibility of virtualization.",
+    "azure blob storage": "Azure Blob Storage is object storage for unstructured data like text and binary data, optimized for massive amounts of data.",
+    "azure sql": "Azure SQL Database is fully managed relational database with built-in intelligence, automatic tuning, and 99.99% availability.",
+    "azure functions": "Azure Functions is serverless compute service enabling event-driven code execution without managing infrastructure, supporting multiple languages.",
+    "azure kubernetes service": "Azure Kubernetes Service (AKS) simplifies Kubernetes deployment and management with automated upgrades, scaling, and monitoring.",
+    "aks": "Azure Kubernetes Service (AKS) is managed Kubernetes with simplified deployment, automatic upgrades, and integrated CI/CD.",
+    "azure devops": "Azure DevOps provides developer services for teams to plan work, collaborate on code, and build and deploy applications with CI/CD pipelines.",
+    "azure pipelines": "Azure Pipelines automatically builds and tests code projects, supporting any language, platform, and cloud with CI/CD capabilities.",
+    "azure container instances": "Azure Container Instances offers fastest way to run containers without managing servers, with per-second billing.",
+    "azure app service": "Azure App Service is fully managed platform for building, deploying, and scaling web apps with built-in auto-scaling and load balancing.",
+    "azure load balancer": "Azure Load Balancer distributes network traffic across multiple VMs with high availability and network performance at Layer 4.",
+    "azure application gateway": "Azure Application Gateway is Layer 7 load balancer with web application firewall, SSL termination, and URL-based routing.",
+    "azure monitor": "Azure Monitor collects, analyzes, and acts on telemetry from cloud and on-premises environments to maximize application performance.",
+    "azure key vault": "Azure Key Vault safeguards cryptographic keys and secrets used by cloud applications and services with HSM-backed security.",
+    "azure active directory": "Azure Active Directory (Azure AD) is cloud-based identity and access management service for employee sign-in and resource access.",
+    "azure resource manager": "Azure Resource Manager (ARM) is deployment and management service providing consistent management layer for Azure resources.",
+    
+    # ==================== GCP SERVICES ====================
+    "compute engine": "Google Compute Engine provides virtual machines running on Google's infrastructure with custom machine types and sustained use discounts.",
+    "cloud storage": "Google Cloud Storage is unified object storage with global edge caching, offering multiple storage classes for different access patterns.",
+    "cloud sql": "Google Cloud SQL is fully managed relational database service for MySQL, PostgreSQL, and SQL Server with automatic replication and backups.",
+    "cloud functions": "Google Cloud Functions is serverless execution environment for building and connecting cloud services with event-driven code.",
+    "gke": "Google Kubernetes Engine (GKE) is managed Kubernetes service with auto-scaling, auto-upgrades, and built-in security and monitoring.",
+    "google kubernetes engine": "Google Kubernetes Engine (GKE) provides managed Kubernetes clusters with Google's reliability, security, and operational expertise.",
+    "cloud run": "Google Cloud Run is fully managed platform for deploying containerized applications that automatically scales up and down to zero.",
+    "app engine": "Google App Engine is fully managed serverless platform for developing and hosting web applications at scale with automatic scaling.",
+    "cloud build": "Google Cloud Build executes builds on Google Cloud infrastructure with support for Docker, custom build steps, and CI/CD integration.",
+    "cloud pub/sub": "Google Cloud Pub/Sub is messaging service for event-driven systems and streaming analytics with global message delivery.",
+    "bigquery": "Google BigQuery is serverless, highly scalable data warehouse with built-in machine learning and real-time analytics capabilities.",
+    "cloud load balancing": "Google Cloud Load Balancing distributes traffic across multiple instances globally with automatic scaling and high availability.",
+    "cloud cdn": "Google Cloud CDN delivers content with low latency using Google's globally distributed edge points of presence.",
+    "cloud iam": "Google Cloud IAM manages access control with fine-grained permissions and organizational policies for secure resource access.",
+    "stackdriver": "Google Stackdriver (now Cloud Operations) provides monitoring, logging, and diagnostics for applications on GCP and AWS.",
+    
+    # ==================== KUBERNETES ====================
+    "kubernetes": "Kubernetes is open-source container orchestration platform automating deployment, scaling, and management of containerized applications across clusters.",
+    "k8s": "Kubernetes (K8s) orchestrates containers across multiple hosts, providing mechanisms for deployment, maintenance, and scaling of applications.",
+    "pod": "A Pod is the smallest deployable unit in Kubernetes containing one or more containers sharing storage, network, and specifications.",
+    "deployment": "Kubernetes Deployment provides declarative updates for Pods and ReplicaSets, managing rollouts, rollbacks, and scaling of applications.",
+    "service": "Kubernetes Service is abstraction defining logical set of Pods and policy to access them, providing stable networking and load balancing.",
+    "configmap": "ConfigMap stores non-confidential configuration data as key-value pairs, allowing you to decouple configuration from container images.",
+    "secret": "Kubernetes Secrets store sensitive information like passwords, tokens, and keys in base64 encoding, separate from Pod specifications.",
+    "secrets": "Kubernetes Secrets store and manage sensitive information like passwords, OAuth tokens, and SSH keys with encryption at rest.",
+    "namespace": "Kubernetes Namespace provides virtual clusters within physical cluster for resource isolation and multi-tenancy support.",
+    "ingress": "Kubernetes Ingress manages external access to services with HTTP/HTTPS routing, SSL termination, and name-based virtual hosting.",
+    "statefulset": "StatefulSet manages stateful applications with stable network identities, persistent storage, and ordered deployment and scaling.",
+    "daemonset": "DaemonSet ensures all or specific nodes run a copy of a Pod, useful for cluster storage, log collection, and monitoring.",
+    "replicaset": "ReplicaSet maintains stable set of replica Pods running at any given time, ensuring specified number of Pod replicas.",
+    "helm": "Helm is package manager for Kubernetes, simplifying deployment and management of applications using charts (pre-configured packages).",
+    "kubectl": "kubectl is command-line tool for interacting with Kubernetes clusters, managing resources, and troubleshooting applications.",
+    
+    # ==================== DOCKER ====================
+    "docker": "Docker is platform using OS-level virtualization to deliver software in containers, ensuring consistency across development, testing, and production.",
+    "container": "A container is lightweight, standalone executable package including code, runtime, libraries, and system tools, ensuring portability.",
+    "dockerfile": "Dockerfile is text file containing instructions to build Docker image, defining base image, dependencies, and application configuration.",
+    "docker compose": "Docker Compose defines and runs multi-container applications using YAML files, simplifying complex application deployment.",
+    "docker swarm": "Docker Swarm is native clustering and orchestration tool for Docker, turning multiple Docker hosts into single virtual host.",
+    "docker hub": "Docker Hub is cloud-based registry for sharing Docker images publicly or privately with automated builds and webhooks.",
+    
+    # ==================== CI/CD TOOLS ====================
+    "jenkins": "Jenkins is open-source automation server for continuous integration and delivery with 1500+ plugins supporting building, deploying, and automating projects.",
+    "gitlab ci": "GitLab CI/CD is built-in continuous integration and deployment tool in GitLab with pipelines defined in .gitlab-ci.yml files.",
+    "github actions": "GitHub Actions automates workflows directly in GitHub repositories with event-driven CI/CD, supporting any language and platform.",
+    "circleci": "CircleCI is cloud-based CI/CD platform offering fast builds, easy configuration, and integration with popular version control systems.",
+    "travis ci": "Travis CI is continuous integration service for building and testing projects hosted on GitHub with automatic deployment capabilities.",
+    "bamboo": "Atlassian Bamboo is continuous integration and deployment tool with built-in Git branching workflows and deployment projects.",
+    "teamcity": "JetBrains TeamCity is powerful CI/CD server with extensive VCS support, parallel builds, and comprehensive build history.",
+    
+    # ==================== INFRASTRUCTURE AS CODE ====================
+    "terraform": "Terraform is infrastructure as code tool using declarative configuration files to provision and manage cloud infrastructure across multiple providers.",
+    "ansible": "Ansible is agentless automation tool using YAML playbooks for configuration management, application deployment, and orchestration.",
+    "puppet": "Puppet is configuration management tool using declarative language to define system configurations and automate infrastructure management.",
+    "chef": "Chef is configuration management tool using Ruby-based DSL for writing system configurations as code with client-server architecture.",
+    "cloudformation": "AWS CloudFormation models and provisions AWS resources using templates, enabling infrastructure as code with version control.",
+    "arm templates": "Azure Resource Manager (ARM) templates define infrastructure and configuration for Azure resources using JSON declarative syntax.",
+    "pulumi": "Pulumi is infrastructure as code platform using familiar programming languages like Python, TypeScript, and Go instead of DSLs.",
+    
+    # ==================== MONITORING & LOGGING ====================
+    "prometheus": "Prometheus is open-source monitoring system with time-series database, powerful query language, and alerting capabilities.",
+    "grafana": "Grafana is analytics and visualization platform for metrics from multiple sources with customizable dashboards and alerting.",
+    "elk stack": "ELK Stack (Elasticsearch, Logstash, Kibana) provides centralized logging for searching, analyzing, and visualizing log data in real-time.",
+    "elasticsearch": "Elasticsearch is distributed search and analytics engine for all types of data with near real-time search capabilities.",
+    "logstash": "Logstash is data processing pipeline ingesting data from multiple sources, transforming it, and sending to destinations like Elasticsearch.",
+    "kibana": "Kibana is visualization tool for Elasticsearch data with interactive dashboards, charts, and search capabilities.",
+    "datadog": "Datadog is monitoring and analytics platform for cloud-scale applications providing full-stack observability with 400+ integrations.",
+    "new relic": "New Relic is observability platform providing application performance monitoring, infrastructure monitoring, and log management.",
+    "splunk": "Splunk is platform for searching, monitoring, and analyzing machine-generated data with real-time insights and security analytics.",
+    "nagios": "Nagios is open-source monitoring system for networks, servers, and applications with alerting and reporting capabilities.",
+    
+    # ==================== VERSION CONTROL ====================
+    "git": "Git is distributed version control system tracking changes in source code, enabling collaboration with branching, merging, and history.",
+    "github": "GitHub is web-based Git repository hosting service with collaboration features, pull requests, issues, and CI/CD integration.",
+    "gitlab": "GitLab is complete DevOps platform with Git repository management, CI/CD, issue tracking, and container registry.",
+    "bitbucket": "Bitbucket is Git repository management solution with built-in CI/CD, code review, and Jira integration.",
+    "svn": "Apache Subversion (SVN) is centralized version control system tracking changes to files and directories over time.",
+    
+    # ==================== CONTAINER ORCHESTRATION ====================
+    "openshift": "Red Hat OpenShift is enterprise Kubernetes platform with developer and operational tools for containerized application deployment.",
+    "rancher": "Rancher is complete container management platform for Kubernetes with multi-cluster management and centralized authentication.",
+    "nomad": "HashiCorp Nomad is flexible orchestrator for deploying and managing containers and non-containerized applications across infrastructure.",
+    
+    # ==================== SERVICE MESH ====================
+    "istio": "Istio is open-source service mesh providing traffic management, security, and observability for microservices without code changes.",
+    "linkerd": "Linkerd is lightweight service mesh for Kubernetes providing reliability, security, and observability with minimal resource overhead.",
+    "consul": "HashiCorp Consul is service mesh solution providing service discovery, configuration, and segmentation with multi-datacenter support.",
+    
+    # ==================== PROGRAMMING LANGUAGES ====================
+    "python": "Python is high-level interpreted language known for readability and simplicity, widely used for web development, data science, automation, and AI.",
+    "java": "Java is object-oriented language running on JVM, known for 'write once, run anywhere' capability, used for enterprise applications.",
+    "javascript": "JavaScript is high-level language enabling interactive web pages, running in browsers and Node.js for server-side development.",
+    "go": "Go (Golang) is statically typed compiled language by Google, known for simplicity, concurrency support, and fast compilation.",
+    "rust": "Rust is systems programming language focusing on safety, concurrency, and performance without garbage collector.",
+    "typescript": "TypeScript is typed superset of JavaScript adding static types, improving code quality and developer productivity.",
+    "ruby": "Ruby is dynamic, object-oriented language known for simplicity and productivity, popular with Rails framework for web development.",
+    "php": "PHP is server-side scripting language designed for web development, powering platforms like WordPress, Drupal, and Laravel.",
+    "c#": "C# is modern object-oriented language by Microsoft for .NET framework, used for Windows applications, games, and web services.",
+    "bash": "Bash is Unix shell and command language for automating tasks, scripting, and system administration in Linux/Unix environments.",
+    
+    # ==================== SCENARIO-BASED Q&A ====================
+    
+    # Troubleshooting Scenarios
+    "pod not starting": "Check: 1) kubectl describe pod to see events, 2) Image pull errors (check registry access), 3) Resource limits (CPU/memory), 4) ConfigMap/Secret missing, 5) Node capacity, 6) kubectl logs for application errors.",
+    "container keeps restarting": "Common causes: 1) Application crashes (check logs), 2) Failed health checks (liveness/readiness probes), 3) OOMKilled (increase memory limits), 4) CrashLoopBackOff (fix application startup), 5) Missing dependencies or environment variables.",
+    "high cpu usage": "Investigate: 1) Identify process with top/htop, 2) Check application logs for infinite loops, 3) Review recent deployments, 4) Scale horizontally if legitimate load, 5) Optimize code or queries, 6) Enable auto-scaling.",
+    "out of memory": "Solutions: 1) Increase memory limits in deployment, 2) Check for memory leaks in application, 3) Optimize caching strategies, 4) Review database connection pooling, 5) Implement horizontal scaling, 6) Use memory profiling tools.",
+    "slow database queries": "Fix: 1) Add indexes on frequently queried columns, 2) Optimize query structure, 3) Use EXPLAIN to analyze query plan, 4) Implement caching (Redis/Memcached), 5) Consider read replicas, 6) Archive old data, 7) Review connection pooling.",
+    "deployment failed": "Debug: 1) Check CI/CD pipeline logs, 2) Verify image tag exists, 3) Review resource quotas, 4) Check RBAC permissions, 5) Validate YAML syntax, 6) Ensure namespace exists, 7) Check network policies.",
+    "service unavailable": "Troubleshoot: 1) Check pod status (kubectl get pods), 2) Verify service selector matches pod labels, 3) Test endpoint connectivity, 4) Review ingress/load balancer config, 5) Check DNS resolution, 6) Verify firewall rules.",
+    "disk space full": "Resolve: 1) Find large files (du -sh), 2) Clean old logs, 3) Remove unused Docker images/containers, 4) Clear package cache, 5) Expand volume size, 6) Implement log rotation, 7) Archive old data.",
+    "ssl certificate expired": "Fix: 1) Renew certificate from CA, 2) Update cert in load balancer/ingress, 3) Use cert-manager for auto-renewal in K8s, 4) Set up monitoring alerts before expiry, 5) Implement Let's Encrypt for automation.",
+    "cannot connect to database": "Check: 1) Database service running, 2) Network connectivity (telnet/nc), 3) Firewall/security group rules, 4) Credentials correct, 5) Connection string format, 6) Database user permissions, 7) Max connections limit.",
+    
+    # Architecture & Design Scenarios
+    "microservices vs monolith": "Choose microservices for: large teams, independent scaling, polyglot requirements, frequent deployments. Choose monolith for: small teams, simple applications, tight coupling, easier debugging. Consider team size, complexity, and operational overhead.",
+    "when to use lambda": "Use Lambda for: event-driven tasks, sporadic workloads, short-running processes (<15 min), auto-scaling needs, cost optimization for low traffic. Avoid for: long-running processes, stateful applications, consistent high traffic.",
+    "sql vs nosql": "Use SQL for: complex queries, ACID transactions, structured data, relationships, reporting. Use NoSQL for: flexible schema, horizontal scaling, high write throughput, document/key-value storage, real-time applications.",
+    "blue green deployment": "Strategy: Run two identical environments (blue=current, green=new). Deploy to green, test thoroughly, switch traffic to green. If issues arise, instantly rollback to blue. Minimizes downtime and risk.",
+    "canary deployment": "Strategy: Gradually roll out changes to small subset of users (5-10%) while monitoring metrics. If successful, incrementally increase traffic. If errors detected, rollback immediately. Reduces blast radius of failures.",
+    "how to scale application": "Horizontal scaling: Add more instances (preferred for stateless apps). Vertical scaling: Increase CPU/memory (limited by hardware). Use auto-scaling based on metrics (CPU, memory, requests). Implement caching, CDN, database read replicas.",
+    "disaster recovery plan": "Strategy: 1) Define RPO (Recovery Point Objective) and RTO (Recovery Time Objective), 2) Implement automated backups, 3) Multi-region deployment, 4) Regular restore testing, 5) Document runbooks, 6) Use IaC for quick rebuild.",
+    "zero downtime deployment": "Techniques: 1) Rolling updates (gradual pod replacement), 2) Blue-green deployment, 3) Canary releases, 4) Feature flags, 5) Database migrations with backward compatibility, 6) Health checks and readiness probes.",
+    "multi region architecture": "Design: 1) Deploy to multiple AWS regions/Azure regions, 2) Use global load balancer (Route53, Traffic Manager), 3) Replicate data across regions, 4) Implement latency-based routing, 5) Plan for regional failover.",
+    "securing microservices": "Best practices: 1) Service mesh for mTLS, 2) API gateway for authentication, 3) Secrets management (Vault, AWS Secrets Manager), 4) Network policies, 5) RBAC, 6) Regular security scanning, 7) Least privilege principle.",
+    
+    # CI/CD Scenarios
+    "ci cd pipeline stages": "Typical stages: 1) Source (code commit), 2) Build (compile, package), 3) Test (unit, integration, security), 4) Deploy to staging, 5) Automated testing, 6) Manual approval, 7) Deploy to production, 8) Monitoring.",
+    "pipeline is slow": "Optimize: 1) Parallelize test execution, 2) Use caching (dependencies, Docker layers), 3) Optimize Docker builds (multi-stage), 4) Run only affected tests, 5) Use faster build agents, 6) Reduce artifact size.",
+    "failed unit tests": "Handle: 1) Block deployment automatically, 2) Notify developer immediately, 3) Provide detailed logs, 4) Run locally to reproduce, 5) Fix code and re-run pipeline, 6) Never skip tests to deploy faster.",
+    "rollback strategy": "Implement: 1) Keep previous version deployments, 2) Use deployment history (kubectl rollout undo), 3) Automated rollback on health check failures, 4) Database migration rollback scripts, 5) Feature flags for instant disable.",
+    "managing secrets in pipeline": "Best practices: 1) Never commit secrets to Git, 2) Use secret management tools (Vault, AWS Secrets Manager), 3) Inject secrets at runtime, 4) Rotate secrets regularly, 5) Use environment-specific secrets, 6) Audit secret access.",
+    
+    # Performance & Optimization Scenarios
+    "reduce docker image size": "Techniques: 1) Use alpine base images, 2) Multi-stage builds, 3) Remove unnecessary files, 4) Combine RUN commands, 5) Use .dockerignore, 6) Avoid installing dev dependencies in production.",
+    "optimize kubernetes resources": "Best practices: 1) Set resource requests and limits, 2) Use horizontal pod autoscaling, 3) Implement pod disruption budgets, 4) Use node affinity for workload placement, 5) Enable cluster autoscaling, 6) Monitor resource usage.",
+    "reduce cloud costs": "Strategies: 1) Right-size instances, 2) Use spot/preemptible instances, 3) Implement auto-scaling, 4) Delete unused resources, 5) Use reserved instances for steady workloads, 6) Optimize storage tiers, 7) Enable cost monitoring alerts.",
+    "improve api performance": "Optimize: 1) Implement caching (Redis), 2) Use CDN for static content, 3) Database query optimization, 4) Add pagination, 5) Compress responses (gzip), 6) Use connection pooling, 7) Implement rate limiting.",
+    "speed up builds": "Techniques: 1) Cache dependencies, 2) Use Docker layer caching, 3) Parallelize builds, 4) Incremental builds, 5) Optimize Dockerfile order, 6) Use build artifacts, 7) Faster build machines.",
+    
+    # Security Scenarios
+    "container security best practices": "Implement: 1) Scan images for vulnerabilities, 2) Use minimal base images, 3) Run as non-root user, 4) Use read-only filesystems, 5) Implement network policies, 6) Regular updates, 7) Sign and verify images.",
+    "prevent ddos attack": "Mitigation: 1) Use WAF (Web Application Firewall), 2) Implement rate limiting, 3) Use CDN with DDoS protection, 4) Auto-scaling to handle load, 5) Geo-blocking, 6) Monitor traffic patterns, 7) Have incident response plan.",
+    "secure api endpoints": "Best practices: 1) Use OAuth2/JWT authentication, 2) Implement HTTPS only, 3) Rate limiting per user, 4) Input validation, 5) CORS configuration, 6) API key rotation, 7) Audit logging, 8) Least privilege access.",
+    "compliance requirements": "Achieve: 1) Encrypt data at rest and in transit, 2) Implement audit logging, 3) Access control (RBAC), 4) Regular security scans, 5) Backup and retention policies, 6) Incident response procedures, 7) Documentation.",
+    "leaked credentials": "Immediate actions: 1) Revoke compromised credentials, 2) Rotate all related secrets, 3) Audit access logs for unauthorized use, 4) Remove from Git history (BFG Repo-Cleaner), 5) Implement secret scanning, 6) Notify security team.",
+    
+    # Monitoring & Alerting Scenarios
+    "what metrics to monitor": "Key metrics: 1) Application: response time, error rate, throughput, 2) Infrastructure: CPU, memory, disk, network, 3) Business: user activity, conversions, 4) Custom: queue length, cache hit rate, 5) Set up alerts for anomalies.",
+    "alert fatigue": "Reduce: 1) Set meaningful thresholds, 2) Use alert aggregation, 3) Implement escalation policies, 4) Remove noisy alerts, 5) Use anomaly detection, 6) Group related alerts, 7) Regular alert review and tuning.",
+    "incident response process": "Steps: 1) Detect and alert, 2) Acknowledge and assign, 3) Investigate root cause, 4) Implement fix or rollback, 5) Verify resolution, 6) Post-mortem analysis, 7) Document lessons learned, 8) Implement preventive measures.",
+    "logging best practices": "Implement: 1) Centralized logging (ELK, CloudWatch), 2) Structured logs (JSON), 3) Appropriate log levels, 4) Include correlation IDs, 5) Log rotation, 6) Secure sensitive data, 7) Retention policies.",
+    "sla vs slo vs sli": "SLI (Service Level Indicator): actual metric (99.9% uptime). SLO (Service Level Objective): internal target (99.95% uptime). SLA (Service Level Agreement): contract with customer (99.9% uptime with penalties).",
+    
+    # Team & Process Scenarios
+    "devops culture": "Principles: 1) Collaboration between dev and ops, 2) Automation of repetitive tasks, 3) Continuous improvement, 4) Shared responsibility, 5) Fast feedback loops, 6) Blameless post-mortems, 7) Infrastructure as code.",
+    "gitflow vs trunk based": "GitFlow: feature branches, release branches, suitable for scheduled releases. Trunk-based: commit to main frequently, feature flags, suitable for continuous deployment. Choose based on team size and release cadence.",
+    "code review best practices": "Guidelines: 1) Review small changes frequently, 2) Automated checks first (linting, tests), 3) Focus on logic and design, 4) Be constructive and respectful, 5) Use checklists, 6) Timely reviews, 7) Learn from feedback.",
+    "infrastructure as code benefits": "Advantages: 1) Version control for infrastructure, 2) Reproducible environments, 3) Faster provisioning, 4) Reduced human error, 5) Documentation as code, 6) Easy disaster recovery, 7) Consistent deployments.",
+    "technical debt management": "Strategy: 1) Track debt in backlog, 2) Allocate time for refactoring (20% rule), 3) Prioritize high-impact debt, 4) Prevent new debt with code reviews, 5) Measure and communicate impact, 6) Balance features with maintenance.",
+}

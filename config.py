@@ -10,9 +10,9 @@ LOGGER = logging.getLogger('VoiceAssistant')
 # Audio Configuration
 SAMPLE_RATE = 16000
 CHUNK_DURATION_MS = 30
-VAD_ENERGY_THRESHOLD = 100  # Energy level to detect speech (configurable)
+VAD_ENERGY_THRESHOLD = 50  # Lowered for better sensitivity
 ENABLE_NOISE_CALIBRATION = True
-NOISE_CALIBRATION_SECONDS = 1.5
+NOISE_CALIBRATION_SECONDS = 0.5  # Faster calibration
 RECOGNITION_LANGUAGE = 'en-US'
 NORMALIZE_AUDIO = True
 # Whisper (offline) configuration - optional. Install `faster-whisper` or
@@ -26,6 +26,13 @@ WHISPER_MODEL = 'small'
 
 # Hotkey Configuration
 HOTKEY = "<ctrl>+<shift>+<space>"
+
+# Parakeet Features
+WAKE_WORD = "hey parakeet"
+WAKE_WORD_ENABLED = False
+COMPACT_MODE = False
+WINDOW_OPACITY = 0.95
+PUSH_TO_TALK = True  # Use push-to-talk like Parakeet AI
 
 # Chrome / Selenium configuration
 # Set to True to run Chrome in headless mode by default. Some environments

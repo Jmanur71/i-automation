@@ -43,8 +43,8 @@ class AudioCapture:
                     d = sd.rec(int(self.sample_rate * NOISE_CALIBRATION_SECONDS), samplerate=self.sample_rate, channels=1, dtype='int16')
                     sd.wait()
                     energy = np.abs(d).mean()
-                    # reduce multiplier to be more sensitive in typical desktop environments
-                    self.noise_threshold = max(self.noise_threshold, int(energy * 1.2))
+                    # More sensitive threshold
+                    self.noise_threshold = max(50, int(energy * 1.5))
                     LOGGER.info('Ambient noise threshold set to %s', self.noise_threshold)
                 except Exception as exc:
                     LOGGER.warning('Noise calibration failed: %s', exc)
@@ -56,7 +56,7 @@ class AudioCapture:
             audio = np.squeeze(audio)
             frames = list(self._frame_generator(audio))
             from collections import deque
-            pre_roll_frames = int(600 / self.chunk_ms)  # 600ms pre-roll
+            pre_roll_frames = int(500 / self.chunk_ms)  # 500ms pre-roll
             ring = deque(maxlen=pre_roll_frames)
             voiced_frames = []
             triggered = False
@@ -69,28 +69,27 @@ class AudioCapture:
                     except Exception:
                         is_speech = False
                 else:
-                    # energy-based fallback (more sensitive)
+                    # More sensitive energy-based detection
                     try:
                         samples = np.frombuffer(frame, dtype=np.int16).astype(np.int32)
                         energy = np.abs(samples).mean()
-                        # allow detection at a fraction of the calibrated noise threshold
-                        is_speech = energy > (self.noise_threshold * 0.6)
+                        # Lower threshold for better detection
+                        is_speech = energy > (self.noise_threshold * 0.4)
                     except Exception:
                         is_speech = False
 
-                # keep a running pre-roll buffer so we don't chop speech onset
                 ring.append(frame)
                 if is_speech:
                     if not triggered:
-                        # include pre-roll
                         voiced_frames.extend(list(ring))
                     voiced_frames.append(frame)
                     triggered = True
                     silence_frames = 0
                 else:
                     if triggered:
+                        voiced_frames.append(frame)  # Include some silence
                         silence_frames += 1
-                        # if we have a long silent tail, stop
+                        # Stop after 1.5s of silence
                         if silence_frames * (self.chunk_ms / 1000.0) > 1.5:
                             break
 
